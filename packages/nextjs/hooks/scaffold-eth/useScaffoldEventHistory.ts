@@ -70,43 +70,55 @@ export const useScaffoldEventHistory = <
       ) as AbiEvent;
 
       const blockNumber = await publicClient.getBlockNumber({ cacheTime: 0 });
+      const from = fromBlock || fromBlockUpdated;
+      const maxBlockRange = 100000n;
 
-      if ((fromBlock && blockNumber >= fromBlock) || blockNumber >= fromBlockUpdated) {
+      if (from > blockNumber) {
+        setIsLoading(false);
+        return;
+      }
+
+      let allLogs: any[] = [];
+      for (let currentFrom = from; currentFrom <= blockNumber; currentFrom += maxBlockRange) {
+        const currentTo = currentFrom + maxBlockRange - 1n < blockNumber ? currentFrom + maxBlockRange - 1n : blockNumber;
         const logs = await publicClient.getLogs({
           address: deployedContractData?.address,
           event,
-          args: filters as any, // TODO: check if it works and fix type
-          fromBlock: fromBlock || fromBlockUpdated,
-          toBlock: blockNumber,
+          args: filters as any,
+          fromBlock: currentFrom,
+          toBlock: currentTo,
         });
-        setFromBlockUpdated(blockNumber + 1n);
-
-        const newEvents = [];
-        for (let i = logs.length - 1; i >= 0; i--) {
-          newEvents.push({
-            log: logs[i],
-            args: logs[i].args,
-            block:
-              blockData && logs[i].blockHash === null
-                ? null
-                : await publicClient.getBlock({ blockHash: logs[i].blockHash as Hash }),
-            transaction:
-              transactionData && logs[i].transactionHash !== null
-                ? await publicClient.getTransaction({ hash: logs[i].transactionHash as Hash })
-                : null,
-            receipt:
-              receiptData && logs[i].transactionHash !== null
-                ? await publicClient.getTransactionReceipt({ hash: logs[i].transactionHash as Hash })
-                : null,
-          });
-        }
-        if (events && typeof fromBlock === "undefined") {
-          setEvents([...newEvents, ...events]);
-        } else {
-          setEvents(newEvents);
-        }
-        setError(undefined);
+        allLogs = [...allLogs, ...logs];
       }
+
+      setFromBlockUpdated(blockNumber + 1n);
+
+      const newEvents = [];
+      for (let i = allLogs.length - 1; i >= 0; i--) {
+        newEvents.push({
+          log: allLogs[i],
+          args: allLogs[i].args,
+          block:
+            blockData && allLogs[i].blockHash === null
+              ? null
+              : await publicClient.getBlock({ blockHash: allLogs[i].blockHash as Hash }),
+          transaction:
+            transactionData && allLogs[i].transactionHash !== null
+              ? await publicClient.getTransaction({ hash: allLogs[i].transactionHash as Hash })
+              : null,
+          receipt:
+            receiptData && allLogs[i].transactionHash !== null
+              ? await publicClient.getTransactionReceipt({ hash: allLogs[i].transactionHash as Hash })
+              : null,
+        });
+      }
+
+      if (events && typeof fromBlock === "undefined") {
+        setEvents([...newEvents, ...events]);
+      } else {
+        setEvents(newEvents);
+      }
+      setError(undefined);
     } catch (e: any) {
       console.error(e);
       setEvents(undefined);
@@ -117,9 +129,11 @@ export const useScaffoldEventHistory = <
   };
 
   useEffect(() => {
-    readEvents(fromBlock);
+    if (enabled && !deployedContractLoading) {
+      readEvents(fromBlock);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fromBlock, enabled]);
+  }, [fromBlock, enabled, deployedContractLoading]);
 
   useEffect(() => {
     if (!deployedContractLoading) {
