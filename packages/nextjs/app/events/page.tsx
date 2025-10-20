@@ -79,7 +79,9 @@ const Events: NextPage = () => {
             <div className="text-center py-8 text-gray-500">
               <p>No events found</p>
               <p className="text-sm">
-                {eventType === "token" ? "Transfer some tokens to see events here" : "Mint some NFTs to see events here"}
+                {eventType === "token"
+                  ? "Transfer some tokens to see events here"
+                  : "Mint some NFTs to see events here"}
               </p>
             </div>
           ) : (

@@ -1,8 +1,8 @@
 "use client";
 
-import type {NextPage} from "next";
-import {NFTCollection} from "~~/components/example-ui/NFTCollection";
-import {TokenBalance} from "~~/components/example-ui/TokenBalance";
+import type { NextPage } from "next";
+import { NFTCollection } from "~~/components/example-ui/NFTCollection";
+import { TokenBalance } from "~~/components/example-ui/TokenBalance";
 import { TokenTransfer } from "~~/components/example-ui/TokenTransfer";
 
 const Home: NextPage = () => {
@@ -23,7 +23,7 @@ const Home: NextPage = () => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
 export default Home;
