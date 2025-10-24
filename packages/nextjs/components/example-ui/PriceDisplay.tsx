@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { WrapperBuilder } from "@redstone-finance/evm-connector";
 import { getSignersForDataServiceId } from "@redstone-finance/sdk";
 import { ethers } from "ethers";
@@ -20,7 +20,7 @@ export const PriceDisplay = ({ symbol }: PriceDisplayProps) => {
   // [THE WHY]: Hook ini ngambil info (alamat & ABI) dari kontrak 'PriceFeed' kita yang udah di-deploy.
   const { data: deployedContractData } = useDeployedContractInfo("PriceFeed");
 
-  const fetchPrice = useCallback(async () => {
+  const fetchPrice = async () => {
     if (!deployedContractData) {
       setError("PriceFeed contract not deployed. Run: yarn deploy");
       setIsLoading(false);
@@ -67,7 +67,7 @@ export const PriceDisplay = ({ symbol }: PriceDisplayProps) => {
     } finally {
       setIsLoading(false);
     }
-  }, [deployedContractData, symbol]);
+  };
 
   // [THE WHY]: Kita pake 'useEffect' biar fungsi 'fetchPrice' otomatis jalan pas komponen pertama kali muncul.
   // Kita juga bikin 'interval' biar harganya nge-refresh otomatis setiap 30 detik.
@@ -77,7 +77,7 @@ export const PriceDisplay = ({ symbol }: PriceDisplayProps) => {
     // [THE WHY]: 'cleanup function' ini penting buat matiin interval pas komponennya udah nggak ditampilin,
     // biar nggak ada 'memory leak'.
     return () => clearInterval(interval);
-  }, [fetchPrice]);
+  }, [deployedContractData, symbol]);
 
   return (
     // [THE WHY]: Ini cuma bagian UI buat nampilin semua 'state' yang udah kita siapin.
