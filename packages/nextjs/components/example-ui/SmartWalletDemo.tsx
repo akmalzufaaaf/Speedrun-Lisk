@@ -1,5 +1,6 @@
-"use client"; // [THE WHY]: WAJIB! Pake hooks (useState, useActiveAccount, useScaffoldContractRead) & interaksi tombol.
+"use client";
 
+// [THE WHY]: WAJIB! Pake hooks (useState, useActiveAccount, useScaffoldContractRead) & interaksi tombol.
 import { useState } from "react";
 // [THE WHY]: Impor fungsi-fungsi inti dari thirdweb buat interaksi kontrak via Smart Wallet.
 import { getContract, prepareContractCall, sendTransaction } from "thirdweb";
@@ -43,7 +44,7 @@ export const SmartWalletDemo = () => {
     contractName: "MyNFT",
     functionName: "balanceOf",
     // [THE WHY]: Kita pake alamat dari hook 'useActiveAccount' thirdweb di sini. Aman!
-    args: [account?.address as `0x${string}`],
+    args: [account?.address as `0x${string}` | undefined],
   });
 
   // --- THE GASLESS MAGIC FUNCTION ---
@@ -92,7 +93,8 @@ export const SmartWalletDemo = () => {
       });
       // --- SIHIR SELESAI ---
 
-      notification.success( // [THE WHY]: Kasih notif sukses + link Blockscout. User seneng.
+      notification.success(
+        // [THE WHY]: Kasih notif sukses + link Blockscout. User seneng.
         `Gasless NFT minted! View on Blockscout: https://sepolia-blockscout.lisk.com/tx/${transactionHash}`,
       );
 
@@ -105,8 +107,8 @@ export const SmartWalletDemo = () => {
         refetchSupply();
         refetchBalance();
       }, 2000);
-
-    } catch (error: any) { // [THE WHY]: Error handling itu WAJIB. Kasih tau user kalo gagal.
+    } catch (error: any) {
+      // [THE WHY]: Error handling itu WAJIB. Kasih tau user kalo gagal.
       console.error("Mint failed:", error);
       notification.error(error.message || "Mint failed");
     } finally {
@@ -169,7 +171,9 @@ export const SmartWalletDemo = () => {
 
           {/* Info Box */}
           <div className="alert alert-success mt-4">
-            <svg /* ... icon ... */ > {/* SVG icon for visual cue */}
+            <svg /* ... icon ... */>
+              {" "}
+              {/* SVG icon for visual cue */}
               <path /* ... path data ... */ />
             </svg>
             <span className="text-xs">✨ Minting sponsored by thirdweb paymaster - $0 gas cost!</span>
