@@ -77,7 +77,7 @@ export const PriceDisplay = ({ symbol }: PriceDisplayProps) => {
     // [THE WHY]: 'cleanup function' ini penting buat matiin interval pas komponennya udah nggak ditampilin,
     // biar nggak ada 'memory leak'.
     return () => clearInterval(interval);
-  }, [deployedContractData, symbol]);
+  }, [deployedContractData, symbol, fetchPrice]);
 
   return (
     // [THE WHY]: Ini cuma bagian UI buat nampilin semua 'state' yang udah kita siapin.
