@@ -49,10 +49,10 @@ contract NFTMarketplace is ReentrancyGuard {
         require(!listings[tokenId].isActive == true, "Token already listed");
         
         listings[tokenId] = Listing({
-            seller = msg.sender;
-            price = price;
-            isActive = true;
-        })
+            seller : msg.sender,
+            price : price,
+            isActive : true
+        });
         
         emit ItemListed(tokenId, msg.sender, price);
     }
@@ -84,7 +84,7 @@ contract NFTMarketplace is ReentrancyGuard {
             require(refundSuccess, "Refund failed");
         }
         
-        emit ItemSold(tokenId, listing.seller, msg.sender);
+        emit ItemSold(tokenId, msg.sender, listing.seller, listing.price);
     }
     
     /**
@@ -99,7 +99,7 @@ contract NFTMarketplace is ReentrancyGuard {
         
         listing.isActive = false;
         
-        emit ItemCanceled(tokenId, listing.seller);
+        emit ItemCancelled(tokenId, listing.seller);
     }
     
     /**
